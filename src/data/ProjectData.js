@@ -6,7 +6,7 @@ export const ProjectList = [
     description:
       "A Movie Recommender system using the R programming language and the Shiny framework.",
     tech_stack: ["R", "Shiny", "User-Based Collaborative Filtering", "Item-Based Collaborative Filtering"],
-    github_url: "",
+    github_url: "https://github.com/YelenaYY/Movie-Recommender",
     demo_url: "https://yelenayu.shinyapps.io/movie_recommender/",
     pdf_url: "",
   },
@@ -24,7 +24,7 @@ export const ProjectList = [
     img: "/police-fairness.png",
     title: "Police Fairness Analysis",
     description:
-      "An app where users can purchase online therapy sessions and chat with their therapists.",
+      "A project used hierarchical Bayesian regression model to investigate discrimination against Asians during traffic stops.",
     tech_stack: ["R", "JAGS", "Markov Chain Monte-Carlo Simulations", "Hierarchical Bayesian Regression"],
     github_url: "https://github.com/YelenaYY/Police-Fairness-Analysis",
     demo_url: "",
