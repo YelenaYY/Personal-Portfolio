@@ -23,30 +23,39 @@ function About() {
         </ScrollAnimation>
           <div className="AboutBio">
             <ScrollAnimation animateIn="fadeInLeft">
-            Hello! My name is <strong>Yelena(Yue) Yu</strong>. 
-            I'm originally from China and have been living in the United States for the past eight years. 
-            I'm currently pursuing a Master’s degree in Computer Science at Northeastern University. 
-            This is my third semester in Northeastern University and I am studying Could computing. 
-            I’ve learnt programming languages including Python, Java, C++, C, JavaScript and R. I studied in Applied Financial Mathematics at Pepperdine University, 
-            and also got a Bachelor’s degree in Accounting at Southwest University of Science and Technology in China. 
-            I also hold an MBA degree with a focus on Information Technology from William Jessup University.
-            From my prior working experiences, I gained valuable experience through various positions in differenct industies, which greatly enhanced my work ethic, communication skills, and adaptability.
+            Hello! My name is <strong>Yelena Yu</strong>. 
+            I’m pursuing a Master’s degree in Computer Science at Northeastern University, 
+            where I am in my fourth semester and fully dedicated to research.
+
+            I am proficient in various programming languages, including Python, Java, C++, C, JavaScript, and R. 
+            Previously, I studied Applied Financial Mathematics at Pepperdine University, where I developed mathematical foundations and analytical skills that complement my technical expertise.
+
+            My focus is on machine learning and data mining, with a keen interest in its applications within healthcare. 
             </ScrollAnimation>
 
             <br /><br />
             
             <ScrollAnimation animateIn="fadeInLeft">
-            My studies at Pepperdine University in Financial Mathematics, my MBA studies with a focus on Information Technology 
-            and my robust passion in problem-solving and logical thinking
-            cultivated my interest in studying Software Engineering & Computer Science and pursuing a career in the technology industry.
+            Since May 2024, I have been interning at Arcadia.io as a Data Scientist. 
+            In this role, I automated data processing workflows in AWS RedShift, 
+            which reduced manual data handling time by 30% using reusable SQL queries. 
+            I leveraged PySpark for statistical analysis and employed visualization frameworks. 
+            My work also involves developing machine learning algorithms with scikit-learn in AWS SageMaker, 
+            where I have enhanced the accuracy of re-admission predictions by 20% through advanced feature engineering and model evaluation.
             </ScrollAnimation>
 
             <br /><br />
 
             <ScrollAnimation animateIn="fadeInLeft">
-              Two areas that particularly interests me are cloud computing and natural language processing.
-              Currently studying in AWS Cloud Architecting and Natural Language Processing with Transformers further convinced me in 
-              continuing exploring exciting projects in the future.
+            In addition to my internship, I am an open-source contributor to the SKTIME Python ML and AI 
+            framework for time series forecasting. 
+            As part of the Summer Mentorship Program, I developed an outlier detection algorithm using innovative 
+            techniques like a sliding window approach and KNN algorithms, based on latest research publications. 
+            I also maintain estimator wrappers for the SKTIME interface and collaborate with 
+            mentors to enhance the library's performance and usability.
+            </ScrollAnimation>
+
+            <ScrollAnimation animateIn="fadeInLeft">
               <div className="tagline2">
                 I have become confident using the following technologies:
               </div>

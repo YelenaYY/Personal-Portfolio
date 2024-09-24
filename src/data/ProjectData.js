@@ -87,8 +87,8 @@ export const stackList = [
     name: "D3.js",
   },
   {
-    img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/spring/spring-original-wordmark.svg",
-    name: "Spring",
+    img: "https://img.icons8.com/?size=100&id=cdYUlRaag9G9&format=png&color=000000",
+    name: "Docker",
   },
   {
     img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/flask/flask-original.svg",
@@ -108,11 +108,15 @@ export const stackList = [
   },
   {
     img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
-    name: "S3 EC2",
+    name: "S3",
   },
   {
-    img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/heroku/heroku-plain.svg",
-    name: "Heroku",
+    img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+    name: "EC2",
+  },
+  {
+    img: "https://icon.icepanel.io/AWS/svg/Machine-Learning/SageMaker.svg",
+    name: "SageMaker",
   },
   {
     img: "https://raw.githubusercontent.com/devicons/devicon/master/icons/materialui/materialui-original.svg",
