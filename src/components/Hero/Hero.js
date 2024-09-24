@@ -48,7 +48,7 @@ function Hero() {
                     500,
                     'A Software Engineer,',
                     1000,
-                    'A Data Engineer,',
+                    'A Data Scientist,',
                     1000,
                     'And a Computer Science Student at Northeastern University.',
                     // 'I design and code beautifully simple things, and I love what I do.',
