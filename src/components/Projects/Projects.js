@@ -3,6 +3,7 @@ import ProjectCard from "./ProjectCard/ProjectCard";
 function Projects() {
   return (
     <>
+      <Analytics />
       <svg
         height="100%"
         width="100%"

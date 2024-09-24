@@ -16,6 +16,7 @@ function Contact() {
   };
 
   return (
+    <Analytics />
     <ContactWrapper id="contact">
 
       <div className="Container">

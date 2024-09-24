@@ -11,6 +11,7 @@ import {
 import ScrollAnimation from "react-animate-on-scroll";
 function About() {
   return (
+  	<Analytics />
     <ContactWrapper id="about">
       <div className="Container">
         <div className="SectionTitle">About Me</div>
