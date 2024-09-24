@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import React from "react";
 import Hero from "../components/Hero/Hero";
 import Projects from "../components/Projects/Projects";
@@ -16,6 +17,7 @@ function Home() {
       <FixSocialIcon />
       <Footer />
       <ScrollToTop />
+      <Analytics />
     </>
   );
 }
