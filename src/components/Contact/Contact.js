@@ -16,9 +16,8 @@ function Contact() {
   };
 
   return (
-    <Analytics />
     <ContactWrapper id="contact">
-
+      <Analytics />
       <div className="Container">
         <div className="SectionTitle">Contact me</div>
         <ScrollAnimation animateIn="fadeIn" >
