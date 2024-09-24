@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import React from "react";
 import ProjectCard from "./ProjectCard/ProjectCard";
 function Projects() {
