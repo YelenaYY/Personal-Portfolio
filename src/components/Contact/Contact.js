@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react';
 import React, { useState } from "react";
 import { ContactWrapper, Email } from "./ContactElements";
 import { MdContentCopy } from "react-icons/md";
@@ -18,7 +17,6 @@ function Contact() {
 
   return (
     <ContactWrapper id="contact">
-      <Analytics />
       <div className="Container">
         <div className="SectionTitle">Contact me</div>
         <ScrollAnimation animateIn="fadeIn" >

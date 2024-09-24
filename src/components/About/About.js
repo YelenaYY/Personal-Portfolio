@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react';
 import React from "react";
 import { stackList } from "../../data/ProjectData";
 import {
@@ -13,7 +12,6 @@ import ScrollAnimation from "react-animate-on-scroll";
 function About() {
   return (
     <ContactWrapper id="about">
-      <Analytics />
       <div className="Container">
         <div className="SectionTitle">About Me</div>
         <div className="BigCard">
