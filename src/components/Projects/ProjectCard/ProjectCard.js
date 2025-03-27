@@ -37,6 +37,16 @@ function ProjectCard() {
                     Github
                   </a>
                 )}
+                {list.poster && list.poster.length > 0 && (
+                  <a
+                    className="btn SecondaryBtn btn-shadow"
+                    href={list.poster}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Poster
+                  </a>
+                )}
                 {list.demo_url.length > 0 && (
                   <a
                     className="btn PrimaryBtn btn-shadow"

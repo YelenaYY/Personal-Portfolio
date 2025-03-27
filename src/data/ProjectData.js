@@ -1,6 +1,17 @@
 // --------------------------------------- Project List
 export const ProjectList = [
   {
+    img: "/poster-day.jpg",
+    title: "Deep Learning for Heart Failure Prediction",
+    description:
+      "Designed novel architectures for heart failure prediction, enabling integration of time-series vital data with demographic info. Implemented RNN-GRU, RNN-LSTM, and Transformer models in PyTorch, successfully forecasting heart failure for various future time windows. Performed hyperparameter and architecture tuning using Optuna, achieving highest AUC of 0.87. Earned 2nd place at Poster Day among 100+ research projects.",
+    tech_stack: ["Transformer", "RNN-GRU", "RNN-LSTM", "Pytorch", "Optuna"],
+    github_url: "https://github.com/YelenaYY/Arcadia-Northeastern-University_Research_Capstone",
+    poster: "/CS7980 - Heart Failure Prediction-final.pdf",
+    demo_url: "",
+    pdf_url: "",
+  },
+  {
     img: "/movie-recommendation.png",
     title: "Moive Recommender",
     description:
