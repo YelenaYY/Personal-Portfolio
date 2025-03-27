@@ -1,7 +1,7 @@
 // --------------------------------------- Project List
 export const ProjectList = [
   {
-    img: "/poster-day.jpg",
+    img: "/poster-day.png",
     title: "Deep Learning for Heart Failure Prediction",
     description:
       "Designed novel architectures for heart failure prediction, enabling integration of time-series vital data with demographic info. Implemented RNN-GRU, RNN-LSTM, and Transformer models in PyTorch, successfully forecasting heart failure for various future time windows. Performed hyperparameter and architecture tuning using Optuna, achieving highest AUC of 0.87. Earned 2nd place at Poster Day among 100+ research projects.",
