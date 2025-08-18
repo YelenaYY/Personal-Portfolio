@@ -1,9 +1,9 @@
 import React from "react";
-import ProjectCard from "./ProjectCard/ProjectCard";
+import ExperienceCard from "./ExperienceCard/ExperienceCard";
 
-function Projects() {
+function Experiences() {
   return (
-    <div id="projects">
+    <div id="experiences">
       <svg
         height="100%"
         width="100%"
@@ -21,12 +21,12 @@ function Projects() {
       </svg>
       <div className="ProjectWrapper">
         <div className="Container">
-          <div className="SectionTitle">Research & Projects</div>
-          <ProjectCard />
+          <div className="SectionTitle">Professional Experiences</div>
+          <ExperienceCard />
         </div>
       </div>
     </div>
   );
 }
 
-export default Projects;
+export default Experiences; 

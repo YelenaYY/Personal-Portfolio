@@ -18,9 +18,9 @@ const Header = ({ toggle }) => {
           <NavLink className="menu-item" to="projects">
             Projects
           </NavLink>
-          <BtnLink className="menu-item" href='/Resume_Yelena-Yu.pdf' target="_blank" rel="noopener noreferrer">
-            Resume
-          </BtnLink>
+          <NavLink className="menu-item" to="experiences">
+            Experiences
+          </NavLink>
           <NavLink className="menu-item" to="contact">
             Contact
           </NavLink>
