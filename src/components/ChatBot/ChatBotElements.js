@@ -24,7 +24,7 @@ export const ChatBotContainer = styled.div`
 `;
 
 export const ChatHeader = styled.div`
-  background: linear-gradient(135deg, #39baec 0%, #2196f3 100%);
+  background: linear-gradient(135deg, #39baec 0%, #3986FA 100%);
   color: white;
   padding: 16px 20px;
   border-radius: 16px 16px 0 0;
@@ -156,7 +156,6 @@ export const ChatInputContainer = styled.div`
   background: white;
   border-radius: 0 0 16px 16px;
   display: flex;
-  gap: 12px;
   align-items: center;
   border-top: 1px solid #e0e0e0;
 `;

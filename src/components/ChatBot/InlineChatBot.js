@@ -1,23 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  ChatBotContainer, 
-  ChatHeader, 
-  ChatMessages, 
-  ChatInput, 
-  ChatInputContainer,
-  Message,
-  SendButton,
-  CloseButton,
-  ChatBotIcon
-} from './ChatBotElements';
+  InlineChatBotContainer, 
+  InlineChatHeader, 
+  InlineChatMessages, 
+  InlineChatInput, 
+  InlineChatInputContainer,
+  InlineMessage,
+  InlineSendButton,
+  InlineChatBotIcon,
+  InlineChatIntro
+} from './InlineChatBotElements';
 import { searchKnowledgeBase } from '../../data/ChatbotKnowledgeBase';
-import { FaPaperPlane, FaTimes, FaRobot, FaUser } from 'react-icons/fa';
+import { FaPaperPlane, FaRobot, FaUser } from 'react-icons/fa';
+import ScrollAnimation from "react-animate-on-scroll";
 
-const ChatBot = ({ isOpen, onToggle }) => {
+const InlineChatBot = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm Yelena's AI assistant. I can answer questions about her projects, experience, skills, and background. What would you like to know?",
+      text: "Hi! I'm Yelena's AI assistant. Ask me anything about her projects, experience, skills, or background!",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -83,18 +84,6 @@ const ChatBot = ({ isOpen, onToggle }) => {
       // Retrieve relevant context
       const context = retrieveContext(userMessage);
       
-      // Create prompt with context
-      const prompt = `${context}
-
-User Question: ${userMessage}
-
-Instructions: You are Yelena Yu's portfolio assistant. Answer the user's question based ONLY on the provided portfolio information above. Be helpful, professional, and conversational. If the information isn't available in the context, politely say so and suggest what you can help with instead. Always speak in first person as if you are representing Yelena.
-
-Answer:`;
-
-      // Note: In a real implementation, you would call OpenAI API here
-      // For demo purposes, I'll create a simple response system
-      
       // Simple keyword-based responses for demonstration
       const lowerMessage = userMessage.toLowerCase();
       
@@ -120,6 +109,10 @@ Answer:`;
       
       if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('reach')) {
         return "You can reach me at yu.yue16@northeastern.edu or visit my portfolio website at yelena.info. I'm always excited to discuss opportunities in AI, machine learning, and healthcare technology!";
+      }
+      
+      if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+        return "Hello! Nice to meet you! I'm excited to share information about my work in AI and machine learning. Feel free to ask about my experience at AWS, my research projects, technical skills, or anything else you'd like to know!";
       }
       
       // Default response
@@ -181,68 +174,140 @@ Answer:`;
     }
   };
 
-  if (!isOpen) return null;
+  const quickQuestions = [
+    "What's your experience with AI?",
+    "Tell me about your projects",
+    "What technologies do you use?",
+    "How can I contact you?"
+  ];
+
+  const handleQuickQuestion = (question) => {
+    setInputValue(question);
+    // Auto-send the question
+    setTimeout(() => {
+      handleSendMessage();
+    }, 100);
+  };
 
   return (
-    <ChatBotContainer>
-      <ChatHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <ChatBotIcon>
-            <FaRobot />
-          </ChatBotIcon>
-          <div>
-            <h4 style={{ margin: 0, color: 'white' }}>Yelena's AI Assistant</h4>
-            <p style={{ margin: 0, fontSize: '12px', color: '#b0b0b0' }}>Ask me about her work!</p>
-          </div>
+    <div id="ai-assistant">
+      <svg
+        height="100%"
+        width="100%"
+        id="svg"
+        viewBox="0 0 1440 400"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M 0,400 C 0,400 0,200 0,200 C 114.35714285714289,156.53571428571428 228.71428571428578,113.07142857142858 351,131 C 473.2857142857142,148.92857142857142 603.4999999999998,228.25 713,248 C 822.5000000000002,267.75 911.2857142857144,227.92857142857142 1029,210 C 1146.7142857142856,192.07142857142858 1293.3571428571427,196.03571428571428 1440,200 C 1440,200 1440,400 1440,400 Z"
+          stroke="none"
+          strokeWidth="0"
+          fill="#39baec"
+          transform="rotate(-180 720 200)"
+        ></path>
+      </svg>
+      
+      <InlineChatBotContainer>
+        <div className="Container">
+          <ScrollAnimation animateIn="fadeInUp">
+            <div className="SectionTitle">AI Assistant -- WIP</div>
+            <InlineChatIntro>
+              <InlineChatBotIcon>
+                <FaRobot />
+              </InlineChatBotIcon>
+              <div>
+                <h3>Chat with my AI Assistant</h3>
+                <p>Ask questions about my experience, projects, skills, and background. I've trained this assistant on all my portfolio information!</p>
+              </div>
+            </InlineChatIntro>
+
+            <div className="BigCard">
+              <InlineChatHeader>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <InlineChatBotIcon small>
+                    <FaRobot />
+                  </InlineChatBotIcon>
+                  <div>
+                    <h4 style={{ margin: 0, color: 'white' }}>Yelena's AI Assistant</h4>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#b0b0b0' }}>Powered by RAG (Retrieval-Augmented Generation)</p>
+                  </div>
+                </div>
+              </InlineChatHeader>
+
+              <InlineChatMessages data-chat-messages>
+                {messages.map((message) => (
+                  <InlineMessage key={message.id} sender={message.sender}>
+                    <div className="message-avatar">
+                      {message.sender === 'bot' ? <FaRobot /> : <FaUser />}
+                    </div>
+                    <div className="message-content">
+                      <p>{message.text}</p>
+                      <span className="timestamp">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </InlineMessage>
+                ))}
+                {isLoading && (
+                  <InlineMessage sender="bot">
+                    <div className="message-avatar">
+                      <FaRobot />
+                    </div>
+                    <div className="message-content">
+                      <p>Thinking...</p>
+                    </div>
+                  </InlineMessage>
+                )}
+                <div ref={messagesEndRef} />
+              </InlineChatMessages>
+
+              {/* Quick Questions */}
+              <div style={{ padding: '10px 20px', backgroundColor: '#f8f9fa', borderTop: '1px solid #e0e0e0' }}>
+                <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#666', fontWeight: '500' }}>Quick questions:</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {quickQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuickQuestion(question)}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: '#39baec',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '16px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = '#2196f3'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = '#39baec'}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <InlineChatInputContainer>
+                <form onSubmit={(e) => handleSendMessage(e)} style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                  <InlineChatInput
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask about my experience, projects, skills, or anything else..."
+                    disabled={isLoading}
+                  />
+                  <InlineSendButton type="submit" disabled={isLoading || !inputValue.trim()}>
+                    <FaPaperPlane />
+                  </InlineSendButton>
+                </form>
+              </InlineChatInputContainer>
+            </div>
+          </ScrollAnimation>
         </div>
-        <CloseButton onClick={onToggle}>
-          <FaTimes />
-        </CloseButton>
-      </ChatHeader>
-
-      <ChatMessages data-chat-messages>
-        {messages.map((message) => (
-          <Message key={message.id} sender={message.sender}>
-            <div className="message-avatar">
-              {message.sender === 'bot' ? <FaRobot /> : <FaUser />}
-            </div>
-            <div className="message-content">
-              <p>{message.text}</p>
-              <span className="timestamp">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          </Message>
-        ))}
-        {isLoading && (
-          <Message sender="bot">
-            <div className="message-avatar">
-              <FaRobot />
-            </div>
-            <div className="message-content">
-              <p>Thinking...</p>
-            </div>
-          </Message>
-        )}
-        <div ref={messagesEndRef} />
-      </ChatMessages>
-
-      <ChatInputContainer>
-        <form onSubmit={(e) => handleSendMessage(e)} style={{ display: 'flex', gap: '12px', width: '100%' }}>
-          <ChatInput
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask about Yelena's experience, projects, skills..."
-            disabled={isLoading}
-          />
-          <SendButton type="submit" disabled={isLoading || !inputValue.trim()}>
-            <FaPaperPlane />
-          </SendButton>
-        </form>
-      </ChatInputContainer>
-    </ChatBotContainer>
+      </InlineChatBotContainer>
+    </div>
   );
 };
 
-export default ChatBot; 
+export default InlineChatBot; 

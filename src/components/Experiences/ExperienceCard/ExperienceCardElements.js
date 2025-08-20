@@ -21,13 +21,13 @@ export const CardLeft = styled.div`
   justify-self: center;
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: center;
   padding: 2rem;
   img {
     object-fit: contain;
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 468px;
+    max-height: 351px;
   }
 `;
 
