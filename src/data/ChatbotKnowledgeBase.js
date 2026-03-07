@@ -2,6 +2,14 @@
 // This contains structured information about Yelena Yu for the chatbot to reference
 
 export const knowledgeBase = {
+  profile: {
+    headline: "AI/ML engineer and researcher focused on generative AI, RAG systems, healthcare ML, and time-series modeling.",
+    shortBio:
+      "Yelena Yu is a computer science master's student and AI/ML practitioner with experience across generative AI, RAG assistants, healthcare forecasting, deep learning, and cloud-based ML systems.",
+    contactBlurb:
+      "You can reach Yelena through her portfolio website or by email.",
+  },
+
   personal: {
     name: "Yelena Yu",
     currentStatus: "Master's student in Computer Science at Northeastern University, in final semester",
@@ -21,7 +29,7 @@ export const knowledgeBase = {
     ],
     specializations: [
       "Machine Learning",
-      "Data Mining", 
+      "Data Mining",
       "Healthcare AI",
       "Time Series Forecasting",
       "Generative AI",
@@ -182,58 +190,195 @@ export const knowledgeBase = {
   ]
 };
 
-// Helper function to search the knowledge base
-export const searchKnowledgeBase = (query) => {
-  const queryLower = query.toLowerCase();
-  const results = [];
-  
-  // Search through all sections and return relevant content
-  const searchInObject = (obj, context = '') => {
-    for (const [key, value] of Object.entries(obj)) {
-      if (typeof value === 'string') {
-        if (value.toLowerCase().includes(queryLower)) {
-          results.push({ context: context + key, content: value, relevance: 'high' });
+export const detectIntent = (query) => {
+  const q = String(query || "").toLowerCase();
+
+  if (/\b(contact|email|reach|linkedin|github|website)\b/.test(q)) return "contact";
+  if (/\b(skill|skills|tech|stack|technology|technologies|tool|tools)\b/.test(q)) return "skills";
+  if (/\b(experience|background|worked|career|internship|research|ai|ml|machine learning|llm|rag)\b/.test(q)) return "experience";
+  if (/\b(project|projects|built|build|portfolio|demo)\b/.test(q)) return "projects";
+  if (/\b(education|degree|study|university|school)\b/.test(q)) return "education";
+  if (/\b(open source|opensource|sktime)\b/.test(q)) return "openSource";
+  if (/\b(interest|interests)\b/.test(q)) return "interests";
+
+  return "general";
+};
+
+const tokenize = (text) =>
+  String(text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+const scoreItem = (item, queryTokens) => {
+  const haystack = JSON.stringify(item).toLowerCase();
+  let score = 0;
+
+  for (const token of queryTokens) {
+    if (haystack.includes(token)) score += 1;
+  }
+
+  return score;
+};
+
+export const rankItems = (items, query, limit = 5) => {
+  const queryTokens = tokenize(query);
+
+  return (items || [])
+    .map((item) => ({ item, score: scoreItem(item, queryTokens) }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((x) => x.item);
+};
+
+export const buildContextForIntent = (intent, kb = knowledgeBase) => {
+  switch (intent) {
+    case "contact":
+      return {
+        kind: "contact",
+        facts: {
+          name: kb.personal.name,
+          email: kb.personal.contact.email,
+          website: kb.personal.contact.website,
+          contactBlurb: kb.profile.contactBlurb
         }
-      } else if (Array.isArray(value)) {
-        value.forEach((item, index) => {
-          if (typeof item === 'string') {
-            if (item.toLowerCase().includes(queryLower)) {
-              results.push({ context: context + key + `[${index}]`, content: item, relevance: 'medium' });
-            }
-          } else if (typeof item === 'object') {
-            searchInObject(item, context + key + `[${index}].`);
-          }
-        });
-      } else if (typeof value === 'object' && value !== null) {
-        searchInObject(value, context + key + '.');
+      };
+
+    case "skills":
+      return {
+        kind: "skills",
+        facts: {
+          headline: kb.profile.headline,
+          specializations: kb.personal.specializations,
+          skills: kb.skills,
+          topExperience: kb.experience.slice(0, 3)
+        }
+      };
+
+    case "experience":
+      return {
+        kind: "experience",
+        facts: {
+          headline: kb.profile.headline,
+          shortBio: kb.profile.shortBio,
+          specializations: kb.personal.specializations,
+          experience: kb.experience,
+          selectedProjects: kb.projects.slice(0, 3),
+          openSource: kb.openSource
+        }
+      };
+
+    case "projects":
+      return {
+        kind: "projects",
+        facts: {
+          headline: kb.profile.headline,
+          projects: kb.projects,
+          openSource: kb.openSource
+        }
+      };
+
+    case "education":
+      return {
+        kind: "education",
+        facts: {
+          currentStatus: kb.personal.currentStatus,
+          education: kb.personal.education,
+          specializations: kb.personal.specializations
+        }
+      };
+
+    case "openSource":
+      return {
+        kind: "openSource",
+        facts: {
+          openSource: kb.openSource,
+          skills: kb.skills
+        }
+      };
+
+    case "interests":
+      return {
+        kind: "interests",
+        facts: {
+          interests: kb.interests,
+          specializations: kb.personal.specializations
+        }
+      };
+
+    default:
+      return {
+        kind: "general",
+        facts: {
+          headline: kb.profile.headline,
+          shortBio: kb.profile.shortBio,
+          currentStatus: kb.personal.currentStatus,
+          specializations: kb.personal.specializations,
+          experience: kb.experience.slice(0, 2),
+          projects: kb.projects.slice(0, 2),
+          contact: kb.personal.contact
+        }
+      };
+  }
+};
+
+export const retrieveForQuestion = (query, kb = knowledgeBase) => {
+  const intent = detectIntent(query);
+
+  if (intent === "contact") {
+    return buildContextForIntent("contact", kb);
+  }
+
+  if (intent === "skills") {
+    return {
+      kind: "skills",
+      facts: {
+        headline: kb.profile.headline,
+        specializations: kb.personal.specializations,
+        skills: kb.skills,
+        rankedProjects: rankItems(kb.projects, query, 3),
+        rankedExperience: rankItems(kb.experience, query, 2)
       }
-    }
-  };
-  
-  searchInObject(knowledgeBase);
-  
-  // Also search keywords for better matching
-  knowledgeBase.experience.forEach(exp => {
-    if (exp.keywords && exp.keywords.some(keyword => queryLower.includes(keyword) || keyword.includes(queryLower))) {
-      results.push({ 
-        context: 'experience.' + exp.title, 
-        content: exp, 
-        relevance: 'high',
-        type: 'experience'
-      });
-    }
-  });
-  
-  knowledgeBase.projects.forEach(project => {
-    if (project.keywords && project.keywords.some(keyword => queryLower.includes(keyword) || keyword.includes(queryLower))) {
-      results.push({ 
-        context: 'projects.' + project.title, 
-        content: project, 
-        relevance: 'high',
-        type: 'project'
-      });
-    }
-  });
-  
-  return results;
-}; 
+    };
+  }
+
+  if (intent === "experience") {
+    return {
+      kind: "experience",
+      facts: {
+        headline: kb.profile.headline,
+        shortBio: kb.profile.shortBio,
+        specializations: kb.personal.specializations,
+        rankedExperience: rankItems(kb.experience, query, 3),
+        rankedProjects: rankItems(kb.projects, query, 2),
+        openSource: kb.openSource
+      }
+    };
+  }
+
+  if (intent === "projects") {
+    return {
+      kind: "projects",
+      facts: {
+        rankedProjects: rankItems(kb.projects, query, 5),
+        openSource: rankItems(kb.openSource, query, 2)
+      }
+    };
+  }
+
+  if (intent === "education") {
+    return buildContextForIntent("education", kb);
+  }
+
+  if (intent === "openSource") {
+    return buildContextForIntent("openSource", kb);
+  }
+
+  if (intent === "interests") {
+    return buildContextForIntent("interests", kb);
+  }
+
+  return buildContextForIntent("general", kb);
+};

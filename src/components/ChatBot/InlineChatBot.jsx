@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  InlineChatBotContainer, 
-  InlineChatHeader, 
-  InlineChatMessages, 
-  InlineChatInput, 
+import {
+  InlineChatBotContainer,
+  InlineChatHeader,
+  InlineChatMessages,
+  InlineChatInput,
   InlineChatInputContainer,
   InlineMessage,
   InlineSendButton,
   InlineChatBotIcon,
   InlineChatIntro
 } from './InlineChatBotElements';
-import { searchKnowledgeBase } from '../../data/ChatbotKnowledgeBase';
+import { retrieveForQuestion, detectIntent } from '../../data/ChatbotKnowledgeBase';
 import { FaPaperPlane, FaRobot, FaUser } from 'react-icons/fa';
-import ScrollAnimation from "react-animate-on-scroll";
+import ScrollAnimation from 'react-animate-on-scroll';
 
 const InlineChatBot = () => {
   const [messages, setMessages] = useState([
@@ -38,129 +38,110 @@ const InlineChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  // RAG: Retrieve relevant context from knowledge base
   const retrieveContext = (query) => {
-    const searchResults = searchKnowledgeBase(query);
-    
-    // Sort by relevance and take top results
-    const topResults = searchResults
-      .sort((a, b) => {
-        const relevanceOrder = { 'high': 3, 'medium': 2, 'low': 1 };
-        return relevanceOrder[b.relevance] - relevanceOrder[a.relevance];
-      })
-      .slice(0, 5); // Take top 5 most relevant results
+    const intent = detectIntent(query);
+    const retrieved = retrieveForQuestion(query);
 
-    // Format context for the LLM
-    let context = "Based on Yelena Yu's portfolio information:\n\n";
-    
-    topResults.forEach(result => {
-      if (result.type === 'experience') {
-        const exp = result.content;
-        context += `EXPERIENCE: ${exp.title} at ${exp.company} (${exp.duration})\n`;
-        context += `Description: ${exp.description}\n`;
-        context += `Technologies: ${exp.technologies.join(', ')}\n`;
-        context += `Achievements: ${exp.achievements.join('; ')}\n\n`;
-      } else if (result.type === 'project') {
-        const proj = result.content;
-        context += `PROJECT: ${proj.title}\n`;
-        context += `Description: ${proj.description}\n`;
-        context += `Technologies: ${proj.technologies.join(', ')}\n`;
-        context += `Achievements: ${proj.achievements.join('; ')}\n`;
-        if (proj.github) context += `GitHub: ${proj.github}\n`;
-        if (proj.demo) context += `Demo: ${proj.demo}\n\n`;
-      } else {
-        context += `INFO: ${result.content}\n\n`;
-      }
+    return {
+      intent,
+      retrieved,
+    };
+  };
+
+  const generateResponse = async (userMessage) => {
+    const context = retrieveContext(userMessage);
+
+    const history = messages
+      .slice(-8)
+      .map((m) => ({
+        role: m.sender === 'bot' ? 'assistant' : 'user',
+        content: String(m.text ?? ''),
+      }));
+
+    console.log(
+      'Client → /api/chat payload:',
+      JSON.stringify({ message: userMessage, context, history }, null, 2)
+    );
+
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: userMessage,
+        context,
+        history,
+      }),
     });
 
-    return context;
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      console.error('Chat API error:', err);
+      return "Sorry — I’m having trouble right now. Please try again in a moment.";
+    }
+
+    const data = await r.json();
+    return data.reply || "Sorry, I couldn't generate a response.";
   };
 
-  // Generate response using retrieved context
-  const generateResponse = async (userMessage) => {
-    try {
-      // Retrieve relevant context
-      const context = retrieveContext(userMessage);
-      
-      // Simple keyword-based responses for demonstration
-      const lowerMessage = userMessage.toLowerCase();
-      
-      if (lowerMessage.includes('experience') || lowerMessage.includes('work') || lowerMessage.includes('job')) {
-        return "I have exciting experience in AI and machine learning! I'm currently interning at Amazon AWS where I'm working on RAG-enhanced generative AI assistants for security teams. Previously, I worked at Arcadia.io as a Data Scientist focusing on health forecasting, where I improved disease prediction accuracy by 17%. I'm also actively contributing to research at HAI Lab on personality inference using LLMs.";
-      }
-      
-      if (lowerMessage.includes('project') || lowerMessage.includes('github')) {
-        return "I've worked on several exciting projects! My most recent research project on heart failure prediction using deep learning earned 2nd place at Poster Day among 100+ projects, achieving an AUC of 0.87. I've also built a movie recommendation system with R and Shiny, automated stock trading algorithms, and contributed to the SKTIME open-source library for time series forecasting.";
-      }
-      
-      if (lowerMessage.includes('skill') || lowerMessage.includes('technology') || lowerMessage.includes('programming')) {
-        return "I'm proficient in multiple programming languages including Python, Java, R, C++, and JavaScript. I specialize in machine learning frameworks like PyTorch and scikit-learn, and have extensive experience with AWS services (SageMaker, RedShift, S3, EC2). I'm particularly passionate about generative AI, RAG systems, and healthcare applications of AI.";
-      }
-      
-      if (lowerMessage.includes('education') || lowerMessage.includes('school') || lowerMessage.includes('university')) {
-        return "I'm currently completing my Master's in Computer Science at Northeastern University, focusing on machine learning and data mining with healthcare applications. I previously studied Applied Financial Mathematics at Pepperdine University, which gave me strong mathematical foundations that complement my technical skills.";
-      }
-      
-      if (lowerMessage.includes('aws') || lowerMessage.includes('amazon')) {
-        return "I'm thrilled to be joining Amazon AWS as a Software Engineer Intern from May to August 2025! I'll be working on generative AI agents for AWS Security infrastructure, specifically developing RAG-enhanced AI assistants. This builds on my passion for generative AI and my experience with RAG systems.";
-      }
-      
-      if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('reach')) {
-        return "You can reach me at yu.yue16@northeastern.edu or visit my portfolio website at yelena.info. I'm always excited to discuss opportunities in AI, machine learning, and healthcare technology!";
-      }
-      
-      if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-        return "Hello! Nice to meet you! I'm excited to share information about my work in AI and machine learning. Feel free to ask about my experience at AWS, my research projects, technical skills, or anything else you'd like to know!";
-      }
-      
-      // Default response
-      return "That's a great question! I can tell you about my experience at AWS, Arcadia.io, and HAI Lab, my projects in deep learning and AI, my technical skills, education, or how to contact me. What specific area would you like to know more about?";
-      
-    } catch (error) {
-      console.error('Error generating response:', error);
-      return "I apologize, but I'm having trouble processing your question right now. Please try asking about my experience, projects, skills, or education!";
+  const makeId = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
     }
+    return String(Date.now() + Math.random());
   };
 
-  const handleSendMessage = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleSendMessage = async (inputOrEvent) => {
+    let text = '';
+
+    if (inputOrEvent?.preventDefault) {
+      inputOrEvent.preventDefault();
+      inputOrEvent.stopPropagation();
+      text = inputValue;
+    } else if (typeof inputOrEvent === 'string') {
+      text = inputOrEvent;
+    } else {
+      text = inputValue;
     }
-    if (!inputValue.trim()) return;
+
+    const textToSend = String(text ?? '').trim();
+
+    if (!textToSend || isLoading) return;
 
     const userMessage = {
-      id: Date.now(),
-      text: inputValue,
+      id: makeId(),
+      text: textToSend,
       sender: 'user',
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
     try {
-      const response = await generateResponse(inputValue);
-      
+      const response = await generateResponse(textToSend);
+
       const botMessage = {
-        id: Date.now() + 1,
+        id: makeId(),
         text: response,
         sender: 'bot',
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
+      console.error('Generate response failed:', error);
+
       const errorMessage = {
-        id: Date.now() + 1,
+        id: makeId(),
         text: "I apologize, but I'm having trouble right now. Please try again!",
         sender: 'bot',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -176,17 +157,15 @@ const InlineChatBot = () => {
 
   const quickQuestions = [
     "What's your experience with AI?",
-    "Tell me about your projects",
-    "What technologies do you use?",
-    "How can I contact you?"
+    'Tell me about your projects',
+    'What technologies do you use?',
+    'How can I contact you?'
   ];
 
   const handleQuickQuestion = (question) => {
+    if (isLoading) return;
     setInputValue(question);
-    // Auto-send the question
-    setTimeout(() => {
-      handleSendMessage();
-    }, 100);
+    handleSendMessage(question);
   };
 
   return (
@@ -206,18 +185,22 @@ const InlineChatBot = () => {
           transform="rotate(-180 720 200)"
         ></path>
       </svg>
-      
+
       <InlineChatBotContainer>
         <div className="Container">
           <ScrollAnimation animateIn="fadeInUp">
-            <div className="SectionTitle">AI Assistant -- WIP</div>
+            <div className="SectionTitle">Y.AI — Yelena's AI Assistant</div>
+
             <InlineChatIntro>
               <InlineChatBotIcon>
                 <FaRobot />
               </InlineChatBotIcon>
               <div>
                 <h3>Chat with my AI Assistant</h3>
-                <p>Ask questions about my experience, projects, skills, and background. I've trained this assistant on all my portfolio information!</p>
+                <p>
+                  Ask questions about my experience, projects, skills, and background.
+                  I&apos;ve trained this assistant on my portfolio information.
+                </p>
               </div>
             </InlineChatIntro>
 
@@ -228,8 +211,10 @@ const InlineChatBot = () => {
                     <FaRobot />
                   </InlineChatBotIcon>
                   <div>
-                    <h4 style={{ margin: 0, color: 'white' }}>Yelena's AI Assistant</h4>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#b0b0b0' }}>Powered by RAG (Retrieval-Augmented Generation)</p>
+                    <h4 style={{ margin: 0, color: 'white' }}>Yelena&apos;s AI Assistant</h4>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#b0b0b0' }}>
+                      Powered by structured retrieval + LLM
+                    </p>
                   </div>
                 </div>
               </InlineChatHeader>
@@ -243,11 +228,15 @@ const InlineChatBot = () => {
                     <div className="message-content">
                       <p>{message.text}</p>
                       <span className="timestamp">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </span>
                     </div>
                   </InlineMessage>
                 ))}
+
                 {isLoading && (
                   <InlineMessage sender="bot">
                     <div className="message-avatar">
@@ -258,29 +247,52 @@ const InlineChatBot = () => {
                     </div>
                   </InlineMessage>
                 )}
+
                 <div ref={messagesEndRef} />
               </InlineChatMessages>
 
-              {/* Quick Questions */}
-              <div style={{ padding: '10px 20px', backgroundColor: '#f8f9fa', borderTop: '1px solid #e0e0e0' }}>
-                <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#666', fontWeight: '500' }}>Quick questions:</p>
+              <div
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#f8f9fa',
+                  borderTop: '1px solid #e0e0e0'
+                }}
+              >
+                <p
+                  style={{
+                    margin: '0 0 10px 0',
+                    fontSize: '14px',
+                    color: '#666',
+                    fontWeight: '500'
+                  }}
+                >
+                  Quick questions:
+                </p>
+
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {quickQuestions.map((question, index) => (
                     <button
                       key={index}
+                      type="button"
                       onClick={() => handleQuickQuestion(question)}
+                      disabled={isLoading}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: '#39baec',
+                        backgroundColor: isLoading ? '#9ecfe0' : '#39baec',
                         color: 'white',
                         border: 'none',
                         borderRadius: '16px',
                         fontSize: '12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
+                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.3s ease',
+                        opacity: isLoading ? 0.7 : 1
                       }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = '#2196f3'}
-                      onMouseOut={(e) => e.target.style.backgroundColor = '#39baec'}
+                      onMouseOver={(e) => {
+                        if (!isLoading) e.currentTarget.style.backgroundColor = '#2196f3';
+                      }}
+                      onMouseOut={(e) => {
+                        if (!isLoading) e.currentTarget.style.backgroundColor = '#39baec';
+                      }}
                     >
                       {question}
                     </button>
@@ -289,11 +301,14 @@ const InlineChatBot = () => {
               </div>
 
               <InlineChatInputContainer>
-                <form onSubmit={(e) => handleSendMessage(e)} style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                <form
+                  onSubmit={handleSendMessage}
+                  style={{ display: 'flex', gap: '12px', width: '100%' }}
+                >
                   <InlineChatInput
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     placeholder="Ask about my experience, projects, skills, or anything else..."
                     disabled={isLoading}
                   />
@@ -310,4 +325,4 @@ const InlineChatBot = () => {
   );
 };
 
-export default InlineChatBot; 
+export default InlineChatBot;
